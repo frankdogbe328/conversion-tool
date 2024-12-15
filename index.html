@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Converter</title>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        body {
+            font-family: "Poppins", Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(45deg, #ff0000, #ff9a9e, #fad0c4, #fbc2eb, #d291bc, #f6d365, #fda085);
+            background-size: 400% 400%;
+            animation: gradientBG 6s ease infinite; /* Faster animation */
+            color: #333;
+            overflow: hidden;
+        }
+
+        .converter {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .converter h2 {
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .converter input, .converter select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+
+        .converter input:focus, .converter select:focus {
+            border-color: #007bff;
+        }
+
+        .converter button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1em;
+            color: white;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .converter button:hover {
+            background: linear-gradient(90deg, #0056b3, #003f7f);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        fieldset {
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        legend {
+            font-weight: bold;
+            color: #007bff;
+            padding: 0 10px;
+            font-size: 1.1em;
+        }
+
+        #result {
+            font-size: 1.5em;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        marquee {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #007bff;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="converter">
+        <h2>Unit Converter</h2>
+        <input type="number" id="inputValue" placeholder="Enter value">
+        <select id="inputUnit" onchange="updateOutputUnits()">
+            <optgroup label="Length">
+                <option value="meters" data-category="length">Meters</option>
+                <option value="kilometers" data-category="length">Kilometers</option>
+                <option value="miles" data-category="length">Miles</option>
+                <option value="feet" data-category="length">Feet</option>
+            </optgroup>
+            <optgroup label="Weight">
+                <option value="grams" data-category="weight">Grams</option>
+                <option value="kilograms" data-category="weight">Kilograms</option>
+                <option value="pounds" data-category="weight">Pounds</option>
+                <option value="ounces" data-category="weight">Ounces</option>
+            </optgroup>
+            <optgroup label="Temperature">
+                <option value="celsius" data-category="temperature">Celsius</option>
+                <option value="fahrenheit" data-category="temperature">Fahrenheit</option>
+                <option value="kelvin" data-category="temperature">Kelvin</option>
+            </optgroup>
+        </select>
+        <select id="outputUnit"></select>
+        <button onclick="convert()">Convert</button>
+
+        <!-- Result Fieldset -->
+        <fieldset id="resultField" style="display: none;">
+            <legend>Conversion Result</legend>
+            <div id="result">Result: </div>
+        </fieldset>
+    </div>
+
+    <!-- Partners Section -->
+    <marquee behavior="scroll" direction="left">
+        KinFranVic Solutions | Partners: manvickyyy@gmail.com, frankdogbe328@gmail.com, kingsleyquansah69@gmail.com
+    </marquee>
+
+    <script>
+        const inputUnit = document.getElementById("inputUnit");
+        const outputUnit = document.getElementById("outputUnit");
+
+        function updateOutputUnits() {
+            const selectedOption = inputUnit.options[inputUnit.selectedIndex];
+            const selectedCategory = selectedOption.getAttribute("data-category");
+            outputUnit.innerHTML = "";
+
+            for (let option of inputUnit.options) {
+                if (option.getAttribute("data-category") === selectedCategory) {
+                    const newOption = option.cloneNode(true);
+                    outputUnit.appendChild(newOption);
+                }
+            }
+        }
+
+        updateOutputUnits();
+
+        function convert() {
+            const value = parseFloat(document.getElementById("inputValue").value);
+            const fromUnit = inputUnit.value;
+            const toUnit = outputUnit.value;
+
+            if (isNaN(value)) {
+                alert("Please enter a valid number.");
+                return;
+            }
+
+            let result;
+            const lengthConversions = { meters: 1, kilometers: 0.001, miles: 0.000621371, feet: 3.28084 };
+            const weightConversions = { grams: 1, kilograms: 0.001, pounds: 0.00220462, ounces: 0.035274 };
+
+                if (fromUnit === "celsius" || fromUnit === "fahrenheit" || fromUnit === "kelvin") {
+                    result = fromUnit === "celsius" ? (toUnit === "fahrenheit" ? value * 9/5 + 32 : value + 273.15)
+                            : fromUnit === "fahrenheit" ? (toUnit === "celsius" ? (value - 32) * 5/9 : (value - 32) * 5/9 + 273.15)
+                            : (toUnit === "celsius" ? value - 273.15 : (value - 273.15) * 9/5 + 32);
+                } else if (lengthConversions[fromUnit] && lengthConversions[toUnit]) {
+                    result = value * (lengthConversions[toUnit] / lengthConversions[fromUnit]);
+                } else if (weightConversions[fromUnit] && weightConversions[toUnit]) {
+                    result = value * (weightConversions[toUnit] / weightConversions[fromUnit]);
+                } else {
+                    alert("Invalid unit conversion.");
+                    return;
+                }
+
+            const resultField = document.getElementById("resultField");
+            resultField.style.display = "block";
+            document.getElementById("result").innerText = `Result: ${result.toFixed(2)} ${toUnit}`;
+        }
+    </script>
+</body>
+</html>
